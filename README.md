@@ -13,5 +13,5 @@ Runs the app in the development mode.\
 Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
 
 
-User can add new contact to list, update, remove, remove all and create random contacts.
+App create Instructor for class and user can add more student. App shows when components will update.
 

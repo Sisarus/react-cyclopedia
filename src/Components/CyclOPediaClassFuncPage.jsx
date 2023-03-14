@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useRef, useState, useId } from "react";
 import { getRandomUser } from "../Utility/api";
 import InstructorFunc from "./InstructorFunc";
 
@@ -12,83 +12,100 @@ const CyclOPediaFuncPage = () => {
     };
   });
 
+  // const [totalRender, setTotalRender] = useState(0);
+  const totalRender = useRef(0); // contain {current: 0}
+  const prevStudentCount = useRef(0); // contain {current: 0}
+  const feedbackInputRef = useRef(null);
+  const id = useId();
+
   const [inputName, setInputName] = useState(() => {
     return "";
   });
   const [inputFeedback, setInputFeedback] = useState(() => {
     return "";
   });
-  // constructor(props) {
-  //   super(props);
-  //   this.state = JSON.parse(
-  //     localStorage.getItem("cylcopediaState")
-  //   ) || {
-  //     instructor: undefined,
-  //     studentList: [],
-  //     studentCount: 0,
-  //     hideInstructor: false,
-  //     inputName: "",
-  //     inputFeedback: "",
-  //   };
-  // }
 
-  // componentDidMount = async () => {
-  //   console.log(JSON.parse(localStorage.getItem("cylcopediaState")));
-  //   console.log("Component did mount");
-  //   if (!JSON.parse(localStorage.getItem("cylcopediaState"))) {
-  //     const response = await getRandomUser();
-  //     console.log(response);
-  //     this.setState((prevState) => {
-  //       return {
-  //         instructor: {
-  //           name:
-  //             response.data.first_name +
-  //             " " +
-  //             response.data.last_name,
-  //           email: response.data.email,
-  //           phone: response.data.phone_number,
-  //         },
-  //       };
-  //     });
-  //   }
-  // };
+  useEffect(() => {
+    console.log("This will be called on EVERY Render");
+    // setTotalRender((prevState) => prevState + 1);
+    totalRender.current = totalRender.current + 1;
+    console.log("render : " + totalRender.current);
+  });
 
-  // componentDidUpdate = async (previousProps, previousState) => {
-  //   console.log("Component did Update");
-  //   localStorage.setItem(
-  //     "cylcopediaState",
-  //     JSON.stringify(this.state)
-  //   );
+  useEffect(() => {
+    console.log("This will be called on Initial/first render/mount");
 
-  //   console.log("old state - " + previousState.studentCount);
-  //   console.log("new state - " + this.state.studentCount);
-  //   if (previousState.studentCount < this.state.studentCount) {
-  //     const response = await getRandomUser();
-  //     this.setState((prevState) => {
-  //       return {
-  //         studentList: [
-  //           ...prevState.studentList,
-  //           {
-  //             name:
-  //               response.data.first_name +
-  //               " " +
-  //               response.data.last_name,
-  //           },
-  //         ],
-  //       };
-  //     });
-  //   } else if (previousState.studentCount > this.state.studentCount) {
-  //     this.setState((prevState) => {
-  //       return {
-  //         studentList: [],
-  //       };
-  //     });
-  //   }
-  // };
+    const getUser = async () => {
+      const response = await getRandomUser();
+      setState((prevState) => {
+        return {
+          ...prevState,
+          instructor: {
+            name:
+              response.data.first_name +
+              " " +
+              response.data.last_name,
+            email: response.data.email,
+            phone: response.data.phone_number,
+          },
+        };
+      });
+    };
 
-  // componentWillUnmount() {
-  //   console.log("Component will unmount");
-  // }
+    if (state.hideInstructor) {
+      getUser();
+    }
+  }, [state.hideInstructor]);
+
+  useEffect(() => {
+    const getUser = async () => {
+      const response = await getRandomUser();
+      setState((prevState) => {
+        return {
+          ...prevState,
+          studentList: [
+            ...prevState.studentList,
+            {
+              name:
+                response.data.first_name +
+                " " +
+                response.data.last_name,
+            },
+          ],
+        };
+      });
+    };
+    console.log(prevStudentCount.current + " " + state.studentCount);
+    if (prevStudentCount.current < state.studentCount) {
+      getUser();
+    } else if (prevStudentCount.current > state.studentCount) {
+      prevStudentCount.current = 0;
+      setState((prevState) => {
+        return { ...prevState, studentList: [] };
+      });
+    }
+  }, [state.studentCount]);
+
+  useEffect(() => {
+    prevStudentCount.current = state.studentCount;
+  }, [state.studentCount]);
+
+  useEffect(() => {
+    console.log("This will be called value of hideInstuctor changes");
+  }, [inputFeedback, inputName]);
+
+  useEffect(() => {
+    feedbackInputRef.current.focus();
+  }, []);
+
+  useEffect(() => {
+    console.log("This will be called on Initial/first render/mount");
+    return () => {
+      console.log(
+        "This will be called on when component eill be Unmounted"
+      );
+    };
+  }, []);
 
   const handleAddStudent = () => {
     setState((prevState) => {
@@ -131,6 +148,7 @@ const CyclOPediaFuncPage = () => {
           <InstructorFunc instructor={state.instructor} />
         ) : null}
       </div>
+      <div className="p-3">Total Render : {totalRender.current}</div>
       <div className="p-3">
         <span className="h4 text-successs">Feedback</span>
         <br />
@@ -141,17 +159,26 @@ const CyclOPediaFuncPage = () => {
           onChange={(e) => {
             setInputName(e.target.value);
           }}
+          id={`${id}-inputName`}
         ></input>{" "}
-        Value: {inputName}
+        <br />
+        <label htmlFor={`${id}-inputName`}>Name Value: </label>{" "}
+        {inputName}
         <br />
         <textarea
+          ref={feedbackInputRef}
           placeholder="Feedback..."
           value={inputFeedback}
           onChange={(e) => {
             setInputFeedback(e.target.value);
           }}
+          id={`${id}-inputFeedback`}
         ></textarea>
-        Value: {state.inputFeedback}
+        <br />
+        <label htmlFor={`${id}-inputFeedback`}>
+          Feedback Value:{" "}
+        </label>{" "}
+        {inputFeedback}
       </div>
       <div className="p-3">
         <span className="h4 text-success">Students</span>

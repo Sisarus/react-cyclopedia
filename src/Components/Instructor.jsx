@@ -1,10 +1,6 @@
 import React from "react";
 
 class Instructor extends React.Component {
-  constructor(props) {
-    super(props);
-  }
-
   componentDidUpdate() {
     console.log("Update - Instructor");
   }

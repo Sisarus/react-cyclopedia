@@ -1,5 +1,5 @@
 import React from "react";
-import { getRandomUser } from "../Utility/api";
+import { getRandomUser } from "../utility/api";
 import Instructor from "./Instructor";
 
 class CyclOPediaPage extends React.Component {

@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState, useId } from "react";
-import { getRandomUser } from "../Utility/api";
+import { getRandomUser } from "../utility/api";
 import InstructorFunc from "./InstructorFunc";
 
 const CyclOPediaFuncPage = () => {
